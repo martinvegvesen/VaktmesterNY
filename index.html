@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Registrer Oppmøte</title>
+    <script>
+      function getLocation() {
+        if (navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition(showPosition);
+        } else {
+          document.getElementById("location").value = "Geolocation is not supported by this browser.";
+        }
+      }
+
+      function showPosition(position) {
+        document.getElementById("location").value = position.coords.latitude + ", " + position.coords.longitude;
+      }
+
+      function submitForm() {
+        var name = document.getElementById("name").value;
+        var place = document.getElementById("place").value;
+        var location = document.getElementById("location").value;
+        var timestamp = new Date().toLocaleString();
+
+        var data = {
+          "fields": {
+            "Navn": name,
+            "Sted": place,
+            "Geolokasjon": location,
+            "Tidspunkt": timestamp
+          }
+        };
+
+        fetch("https://api.airtable.com/v0/appObQPT32wZF5FNG_Lokasjon", {
+          method: "POST",
+          headers: {
+            "Authorization": "Bearer pat3uCc5Htlw04O6z.30165dea65c08a022ccfc774e6f1a1fb1d976837fd4efeeaff1ebad0911cc101",
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify(data)
+        })
+        .then(response => response.json())
+        .then(data => {
+          console.log("Success:", data);
+          document.getElementById("form").reset();
+        })
+        .catch((error) => {
+          console.error("Error:", error);
+        });
+      }
+    </script>
+  </head>
+  <body onload="getLocation()">
+    <form id="form" onsubmit="submitForm(); return false;">
+      Navn: <input type="text" id="name" name="name"><br>
+      Sted: <input type="text" id="place" name="place"><br>
+      Geolokasjon: <input type="text" id="location" name="location" readonly><br>
+      <input type="submit" value="Submit">
+    </form>
+  </body>
+</html>
